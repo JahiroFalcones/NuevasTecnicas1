@@ -115,7 +115,10 @@ class PostController extends Controller
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
+       $autor= \yii\helpers\ArrayHelper::getValue(Post::findOne(['id'=>$id]),'autor');
+       
+       if ($autor==Yii::$app->user->getId()) {
+                   $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
@@ -124,6 +127,13 @@ class PostController extends Controller
                 'model' => $model,
             ]);
         }
+       } else {
+           throw new \yii\web\HttpException(403, 'The requested Item could not be found.'); 
+       }
+       
+       
+        
+
     }
 
     /**
@@ -134,9 +144,15 @@ class PostController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+     $autor= \yii\helpers\ArrayHelper::getValue(Post::findOne(['id'=>$id]),'autor');
+        if ($autor==Yii::$app->user->getId()) {
+                   $this->findModel($id)->delete();
 
         return $this->redirect(['index']);
+       } else {
+           throw new \yii\web\HttpException(403, 'The requested Item could not be found.'); 
+       }
+       
     }
 
     /**
